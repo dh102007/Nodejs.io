@@ -1,0 +1,1 @@
+var letter = 'Loerem ipsum dolor sti amet, consectetur adipiscing'

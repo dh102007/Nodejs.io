@@ -1,0 +1,15 @@
+{
+  "name": "nodejs-io",
+  "version": "1.0.0",
+  "main": "main.js",
+  "homepage": "https://dh102007.github.io/Nodejs.io/",
+  "scripts": {
+    "start": "node main.js",
+    "build": "echo 'No build step needed for plain Node.js'",
+    "deploy": "gh-pages -d public -r https://github.com/dh102007/Nodejs.io.git"
+  },
+  "dependencies": {
+    "gh-pages": "^6.3.0"
+  },  
+  "license": "MIT"
+}
