@@ -172,15 +172,4 @@ const app = http.createServer((request, response) => {
 app.listen(3000, () => {
   console.log('Server running at http://localhost:3000');
 });
-const http = require('http');
-
-const PORT = process.env.PORT || 3000;
-
-const server = http.createServer((req, res) => {
-  res.end('Hello from Railway + Node.js!');
-});
-
-server.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-});
 
