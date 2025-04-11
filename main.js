@@ -4,7 +4,7 @@ const url = require('url');
 const qs = require('querystring');
 
 const template = {
-  HTML: function(title, list, body, control) {
+  HTML: function (title, list, body, control) {
     return `
     <!doctype html>
     <html>
@@ -22,26 +22,26 @@ const template = {
     </html>
     `;
   },
-  list: function(filelist) {
+  list: function (filelist) {
     let list = '<ul class="link">';
     let i = 0;
     while (i < filelist.length) {
-      list += `<li><a href="/?id=${filelist[i]}" class="addlink">${filelist[i]}</a></li>`;
+      const filename = filelist[i];
+      list += `<li><a href="/?id=${encodeURIComponent(filename)}" class="addlink">${filename}</a></li>`;
       i++;
     }
     list += '</ul>';
     return list;
   }
 };
-//css코드 
+
 const app = http.createServer((request, response) => {
   const _url = request.url;
   const queryData = url.parse(_url, true).query;
   const pathname = url.parse(_url, true).pathname;
 
-
   if (pathname === '/style.css') {
-    fs.readFile('style.css', function(err, data) {
+    fs.readFile('style.css', function (err, data) {
       if (err) {
         response.writeHead(404);
         response.end('Not found');
@@ -55,26 +55,27 @@ const app = http.createServer((request, response) => {
 
   if (pathname === '/') {
     if (queryData.id === undefined) {
-      fs.readdir('./data', function(error, filelist) {
+      fs.readdir('./data', function (error, filelist) {
         const title = 'Welcome';
         const description = 'Hello, Node.js';
         const list = template.list(filelist);
         const html = template.HTML(title, list,
           `<ul class="titletext"><li class="maintext"><h2>${title}</h2> <hr> <p>${description}</p></li></ul>`,
-          `<button  onclick="location.href='/create' "  class="followers">create</button>`
+          `<button onclick="location.href='/create'" class="followers">create</button>`
         );
         response.writeHead(200);
         response.end(html);
       });
     } else {
-      fs.readdir('./data', function(error, filelist) {
-        fs.readFile(`data/${queryData.id}`, 'utf8', function(err, description) {
-          const title = queryData.id;
+      const decodedId = decodeURIComponent(queryData.id);
+      fs.readdir('./data', function (error, filelist) {
+        fs.readFile(`data/${decodedId}`, 'utf8', function (err, description) {
+          const title = decodedId;
           const list = template.list(filelist);
           const html = template.HTML(title, list,
             `<ul class="titletext"><li class="maintext"><h2>${title}</h2> <hr><p>${description}</p></li></ul>`,
-            ` <button  onclick="location.href='/create'"class="followers">create</button>
-              <button onclick="location.href='/update?id=${title}'" class="update">update</button>
+            ` <button onclick="location.href='/create'" class="followers">create</button>
+              <button onclick="location.href='/update?id=${encodeURIComponent(title)}'" class="update">update</button>
               <form action="delete_process" method="post" class="btn">  
                 <input type="hidden" name="id" value="${title}">
                 <input type="submit" value="delete" class="delete">
@@ -86,14 +87,14 @@ const app = http.createServer((request, response) => {
       });
     }
   } else if (pathname === '/create') {
-    fs.readdir('./data', function(error, filelist) {
+    fs.readdir('./data', function (error, filelist) {
       const title = 'WEB - create';
       const list = template.list(filelist);
       const html = template.HTML(title, list, `
         <form action="/create_process" method="post">
           <p class="name"><input type="text" name="title" placeholder="title" class="nametext"></p>
           <p class="text"><textarea name="description" placeholder="description" class="main"></textarea></p>
-          <p class="btn"><input type="submit"  class="submit"></p>
+          <p class="btn"><input type="submit" class="submit"></p>
         </form>
       `, '');
       response.writeHead(200);
@@ -101,64 +102,64 @@ const app = http.createServer((request, response) => {
     });
   } else if (pathname === '/create_process') {
     let body = '';
-    request.on('data', function(data) {
+    request.on('data', function (data) {
       body += data;
     });
-    request.on('end', function() {
+    request.on('end', function () {
       const post = qs.parse(body);
       const title = post.title;
       const description = post.description;
-      fs.writeFile(`data/${title}`, description, 'utf8', function(err) {
-        response.writeHead(302, { Location: `/?id=${encodeURI(title)} ` });
+      fs.writeFile(`data/${title}`, description, 'utf8', function (err) {
+        response.writeHead(302, { Location: `/?id=${encodeURIComponent(title)}` });
         response.end();
       });
     });
   } else if (pathname === '/update') {
-    fs.readdir('./data', function(error, filelist) {
-      fs.readFile(`data/${queryData.id}`, 'utf8', function(err, description) {
-        const title = queryData.id;
+    const decodedId = decodeURIComponent(queryData.id);
+    fs.readdir('./data', function (error, filelist) {
+      fs.readFile(`data/${decodedId}`, 'utf8', function (err, description) {
+        const title = decodedId;
         const list = template.list(filelist);
-        const html = template.HTML(title, list, 
-          `
-          <form action="/update_process" method="post">
+        const html = template.HTML(title, list,
+          `<form action="/update_process" method="post">
             <input type="hidden" name="id" value="${title}">
             <p class="name"><input type="text" name="title" placeholder="title" value="${title}" class="nametext"></p>
-            <p class="text"><textarea name="description" placeholder="description"  class="main">${description}</textarea></p>
+            <p class="text"><textarea name="description" placeholder="description" class="main">${description}</textarea></p>
             <p class="name"><input type="submit" class="submit"></p>
-          </form>
-        `, `<button  onclick="location.href='/create'"class="followersbtn">create</button>
-              <button onclick="location.href='/update?id=${title}'" class="updatebtn">update</button>`
-            );
+          </form>`,
+          `<button onclick="location.href='/create'" class="followersbtn">create</button>
+           <button onclick="location.href='/update?id=${encodeURIComponent(title)}'" class="updatebtn">update</button>`
+        );
         response.writeHead(200);
         response.end(html);
       });
     });
   } else if (pathname === '/update_process') {
     let body = '';
-    request.on('data', function(data) {
+    request.on('data', function (data) {
       body += data;
     });
-    request.on('end', function() {
+    request.on('end', function () {
       const post = qs.parse(body);
       const id = post.id;
       const title = post.title;
       const description = post.description;
-      fs.rename(`data/${id}`, `data/${title}`, function(error) {
-        fs.writeFile(`data/${title}`, description, 'utf8', function(err) {
-          response.writeHead(302, { Location: `/?id=${encodeURI(title)}` });
+      fs.rename(`data/${id}`, `data/${title}`, function (error) {
+        fs.writeFile(`data/${title}`, description, 'utf8', function (err) {
+          response.writeHead(302, { Location: `/?id=${encodeURIComponent(title)}` });
           response.end();
         });
       });
     });
   } else if (pathname === '/delete_process') {
     let body = '';
-    request.on('data', function(data) {
+    request.on('data', function (data) {
       body += data;
     });
-    request.on('end', function() {
+    request.on('end', function () {
       const post = qs.parse(body);
       const id = post.id;
-      fs.unlink(`data/${id}`, function(error) {
+      fs.unlink(`data/${id}`, function (error) {
         response.writeHead(302, { Location: `/` });
         response.end();
       });
@@ -172,4 +173,3 @@ const app = http.createServer((request, response) => {
 app.listen(3000, () => {
   console.log('Server running at http://localhost:3000');
 });
-
