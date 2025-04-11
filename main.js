@@ -109,7 +109,7 @@ const app = http.createServer((request, response) => {
       const title = post.title;
       const description = post.description;
       fs.writeFile(`data/${title}`, description, 'utf8', function(err) {
-        response.writeHead(302, { Location: `/?id=${title}` });
+        response.writeHead(302, { Location: `/?id=${encodeURI(title)} ` });
         response.end();
       });
     });
@@ -145,7 +145,7 @@ const app = http.createServer((request, response) => {
       const description = post.description;
       fs.rename(`data/${id}`, `data/${title}`, function(error) {
         fs.writeFile(`data/${title}`, description, 'utf8', function(err) {
-          response.writeHead(302, { Location: `/?id=${title}` });
+          response.writeHead(302, { Location: `/?id=${encodeURI(title)}` });
           response.end();
         });
       });
