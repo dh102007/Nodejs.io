@@ -75,10 +75,9 @@ hr {
   color: #444;
 }
 
-.maintext .btn-fixed, .btn-fixed {
+.btn-fixed {
   display: inline-block;
   margin-right: 10px;
-  margin-top: 20px;
   font-size: 1rem;
   height: 40px;
   border-radius: 0.4rem;
@@ -140,15 +139,29 @@ hr {
 
 .cancel-btn {
   background-color: #6c757d;
-  margin-top: 0;
 }
 
-/* New styles for write section */
+.update-btn {
+  background-color: #28a745;
+}
+
+.delete-btn {
+  background-color: #dc3545;
+}
+
+.back-btn {
+  background-color: #6c757d;
+}
+
+
 .write-section {
   width: 80%;
   margin: 30px auto 0;
-  text-align: end;
- 
+  background-color: white;
+  border: 1px solid #ddd;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .write-section h3 {
@@ -156,7 +169,6 @@ hr {
   font-size: 20px;
 }
 
-/* Form container styles */
 .form-container {
   width: 80%;
   margin: 30px auto;
@@ -171,4 +183,24 @@ hr {
   margin-bottom: 25px;
   font-size: 24px;
   color: #222;
+}
+
+.content-text {
+  font-size: 18px;
+  line-height: 1.6;
+  color: #444;
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border: 1px solid #e9e9e9;
+  border-radius: 5px;
+  min-height: 200px;
+  white-space: pre-wrap;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
 }

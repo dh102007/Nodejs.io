@@ -33,6 +33,7 @@ const template = {
   writeButton: function() {
     return `
       <div class="write-section">
+        <h3>글쓰기</h3>
         <button class="btn-fixed create-btn" onclick="location.href='/create'">글 작성하기</button>
       </div>
     `;
@@ -72,22 +73,22 @@ const app = http.createServer((request, response) => {
       fs.readdir('./data', (error, filelist) => {
         fs.readFile(`data/${decodedId}`, 'utf8', (err, description) => {
           const title = decodedId;
-          const list = template.list(filelist);
-          const writeButton = template.writeButton();
-          const html = template.HTML(title, list, `
-            <ul class="titletext">
-              <li class="maintext">
-                <h2>${title}</h2><hr><p>${description}</p>
-                <div class="button-group">
-                  <button class="btn-fixed update-btn" onclick="location.href='/update?id=${encodeURIComponent(title)}'">update</button>
-                  <form action="/delete_process" method="post" style="display:inline;">
-                    <input type="hidden" name="id" value="${title}">
-                    <input type="submit" value="delete" class="btn-fixed delete-btn">
-                  </form>
-                </div>
-              </li>
-            </ul>
-          `, writeButton);
+          const html = template.HTML(title, '', `
+            <div class="form-container">
+              <h2 class="form-title">${title}</h2>
+              <div class="content-text">
+                ${description}
+              </div>
+              <div class="button-container">
+                <button class="btn-fixed update-btn" onclick="location.href='/update?id=${encodeURIComponent(title)}'">수정</button>
+                <form action="/delete_process" method="post" style="display:inline;">
+                  <input type="hidden" name="id" value="${title}">
+                  <input type="submit" value="삭제" class="btn-fixed delete-btn">
+                </form>
+                <button class="btn-fixed back-btn" onclick="location.href='/'">목록으로</button>
+              </div>
+            </div>
+          `);
           response.writeHead(200);
           response.end(html);
         });
