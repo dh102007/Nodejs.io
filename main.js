@@ -4,7 +4,7 @@ const url = require('url');
 const qs = require('querystring');
 
 const template = {
-  HTML: function (title, list, body) {
+  HTML: function (title, list, body, writeButton = '') {
     return `
     <!doctype html>
     <html>
@@ -17,6 +17,7 @@ const template = {
       <h1><a href="/" class="titlename">WEB</a></h1>
       ${list}
       ${body}
+      ${writeButton}
     </body>
     </html>
     `;
@@ -28,6 +29,13 @@ const template = {
     });
     list += '</ul>';
     return list;
+  },
+  writeButton: function() {
+    return `
+      <div class="write-section">
+        <button class="btn-fixed create-btn" onclick="location.href='/create'">글 작성하기</button>
+      </div>
+    `;
   }
 };
 
@@ -53,16 +61,9 @@ const app = http.createServer((request, response) => {
     if (queryData.id === undefined) {
       fs.readdir('./data', (error, filelist) => {
         const title = 'Welcome';
-        const description = 'Hello, Node.js';
+        const writeButton = template.writeButton();
         const list = template.list(filelist);
-        const html = template.HTML(title, list, `
-          <ul class="titletext">
-            <li class="maintext">
-              <h2>${title}</h2><hr><p>${description}</p>
-              <button class="btn-fixed create-btn" onclick="location.href='/create'">create</button>
-            </li>
-          </ul>
-        `);
+        const html = template.HTML(title, list, '', writeButton);
         response.writeHead(200);
         response.end(html);
       });
@@ -72,19 +73,21 @@ const app = http.createServer((request, response) => {
         fs.readFile(`data/${decodedId}`, 'utf8', (err, description) => {
           const title = decodedId;
           const list = template.list(filelist);
+          const writeButton = template.writeButton();
           const html = template.HTML(title, list, `
             <ul class="titletext">
               <li class="maintext">
                 <h2>${title}</h2><hr><p>${description}</p>
-                <button class="btn-fixed create-btn" onclick="location.href='/create'">create</button>
-                <button class="btn-fixed update-btn" onclick="location.href='/update?id=${encodeURIComponent(title)}'">update</button>
-                <form action="/delete_process" method="post">
-                  <input type="hidden" name="id" value="${title}">
-                  <input type="submit" value="delete" class="btn-fixed delete-btn">
-                </form>
+                <div class="button-group">
+                  <button class="btn-fixed update-btn" onclick="location.href='/update?id=${encodeURIComponent(title)}'">update</button>
+                  <form action="/delete_process" method="post" style="display:inline;">
+                    <input type="hidden" name="id" value="${title}">
+                    <input type="submit" value="delete" class="btn-fixed delete-btn">
+                  </form>
+                </div>
               </li>
             </ul>
-          `);
+          `, writeButton);
           response.writeHead(200);
           response.end(html);
         });
@@ -93,13 +96,18 @@ const app = http.createServer((request, response) => {
   } else if (pathname === '/create') {
     fs.readdir('./data', (error, filelist) => {
       const title = 'WEB - create';
-      const list = template.list(filelist);
-      const html = template.HTML(title, list, `
-        <form action="/create_process" method="post">
-          <p class="name"><input type="text" name="title" placeholder="title" class="nametext"></p>
-          <p class="text"><textarea name="description" placeholder="description" class="main"></textarea></p>
-          <p class="btn"><input type="submit" class="submit"></p>
-        </form>
+      const html = template.HTML(title, '', `
+        <div class="form-container">
+          <h2 class="form-title">새 글 작성</h2>
+          <form action="/create_process" method="post">
+            <p class="name"><input type="text" name="title" placeholder="title" class="nametext"></p>
+            <p class="text"><textarea name="description" placeholder="description" class="main"></textarea></p>
+            <p class="btn">
+              <input type="submit" value="저장" class="submit">
+              <button type="button" class="btn-fixed cancel-btn" onclick="location.href='/'">취소</button>
+            </p>
+          </form>
+        </div>
       `);
       response.writeHead(200);
       response.end(html);
@@ -121,14 +129,19 @@ const app = http.createServer((request, response) => {
     fs.readdir('./data', (error, filelist) => {
       fs.readFile(`data/${decodedId}`, 'utf8', (err, description) => {
         const title = decodedId;
-        const list = template.list(filelist);
-        const html = template.HTML(title, list, `
-          <form action="/update_process" method="post">
-            <input type="hidden" name="id" value="${title}">
-            <p class="name"><input type="text" name="title" value="${title}" class="nametext"></p>
-            <p class="text"><textarea name="description" class="main">${description}</textarea></p>
-            <p class="btn"><input type="submit" class="submit"></p>
-          </form>
+        const html = template.HTML(title, '', `
+          <div class="form-container">
+            <h2 class="form-title">글 수정</h2>
+            <form action="/update_process" method="post">
+              <input type="hidden" name="id" value="${title}">
+              <p class="name"><input type="text" name="title" value="${title}" class="nametext"></p>
+              <p class="text"><textarea name="description" class="main">${description}</textarea></p>
+              <p class="btn">
+                <input type="submit" value="수정" class="submit">
+                <button type="button" class="btn-fixed cancel-btn" onclick="location.href='/?id=${encodeURIComponent(title)}'">취소</button>
+              </p>
+            </form>
+          </div>
         `);
         response.writeHead(200);
         response.end(html);
