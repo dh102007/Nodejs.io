@@ -157,11 +157,7 @@ hr {
 .write-section {
   width: 80%;
   margin: 30px auto 0;
-  background-color: white;
-  border: 1px solid #ddd;
-  padding: 20px;
-  text-align: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: end;
 }
 
 .write-section h3 {

@@ -33,7 +33,6 @@ const template = {
   writeButton: function() {
     return `
       <div class="write-section">
-        <h3>글쓰기</h3>
         <button class="btn-fixed create-btn" onclick="location.href='/create'">글 작성하기</button>
       </div>
     `;
